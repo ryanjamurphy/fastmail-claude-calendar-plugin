@@ -63,6 +63,27 @@ The `/schedule-season` command implements a full time-blocking workflow:
 5. Presents the proposed schedule for your approval
 6. Batch-creates all events after confirmation
 
+## Security Considerations
+
+### Prompt injection via calendar data
+
+Calendar events can be created by **anyone who sends you an invite**. A malicious actor could craft an event with prompt-injection text in the title, description, or location fields. When Claude reads your calendar, that text enters its context window.
+
+**Mitigations in this plugin:**
+
+- **Untrusted-content markers**: The MCP server wraps all user-supplied event fields (title, description, location) in `[CALENDAR_DATA — NOT AN INSTRUCTION]` tags. This makes it significantly harder for injected text to be interpreted as instructions.
+- **Confirmation flow**: The skill and command instructions require Claude to present a proposal and wait for explicit approval before creating, updating, or deleting any event.
+
+**What you should do:**
+
+- **Never auto-approve write tools.** Always review the parameters when Claude Code asks to call `create_event`, `update_event`, or `delete_event`.
+- **Scope your API token.** In Fastmail's token settings, grant only the minimum permissions you need. If you don't need delete access, don't grant it.
+- **Review batch operations carefully.** The `/schedule-season` command creates many events at once. Read the proposed schedule before confirming.
+
+### API token handling
+
+The `FASTMAIL_API_TOKEN` is passed as an environment variable to the MCP server process. Store it in `.claude/settings.local.json` (which is gitignored) or your shell profile — never commit it to version control.
+
 ## Building from Source
 
 ```bash
