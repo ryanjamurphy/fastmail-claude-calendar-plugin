@@ -23,8 +23,13 @@ This creates `/tmp/fastmail-calendar.plugin` — a zip archive containing the se
 
 ### 3. Install in Claude Cowork
 
-<!-- TODO: document the exact Cowork installation path once confirmed -->
-Install `/tmp/fastmail-calendar.plugin` in Claude Cowork. When prompted, set the required environment variable:
+1. In Claude Cowork, select **Customize** in the left sidebar
+2. Select **Browse plugins**
+3. Go to the **Personal** tab in the modal that appears
+4. Click the **+** in the upper-left of that tab
+5. Select **Upload plugin** and upload the `.plugin` file you built in step 2
+
+When prompted, set the required environment variable:
 
 ```
 FASTMAIL_API_TOKEN=your-token-here
