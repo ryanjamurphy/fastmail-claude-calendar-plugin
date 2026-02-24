@@ -10,9 +10,21 @@ A Claude Cowork plugin that integrates with Fastmail's calendar via JMAP. Read, 
 2. Create a new token with **calendar read/write** scope
 3. Copy the token
 
-### 2. Install the Plugin
+### 2. Build the Plugin File
 
-Install the `.plugin` file in Claude Cowork, then set the required environment variable:
+From the root of this repository, install dependencies and package the plugin:
+
+```bash
+npm install
+zip -r /tmp/fastmail-calendar.plugin . -x "node_modules/*" "*.DS_Store" ".git/*"
+```
+
+This creates `/tmp/fastmail-calendar.plugin` — a zip archive containing the server, skills, and plugin manifest.
+
+### 3. Install in Claude Cowork
+
+<!-- TODO: document the exact Cowork installation path once confirmed -->
+Install `/tmp/fastmail-calendar.plugin` in Claude Cowork. When prompted, set the required environment variable:
 
 ```
 FASTMAIL_API_TOKEN=your-token-here
@@ -23,6 +35,8 @@ Optionally set your timezone (defaults to `America/St_Johns`):
 ```
 FASTMAIL_TIMEZONE=America/New_York
 ```
+
+The MCP server starts automatically when Claude needs to use a calendar tool — you don't need to run anything manually.
 
 ## Commands
 
@@ -86,12 +100,4 @@ The `FASTMAIL_API_TOKEN` is passed as an environment variable to the MCP server 
 
 ## Building from Source
 
-```bash
-npm install
-```
-
-## Packaging
-
-```bash
-zip -r /tmp/fastmail-calendar.plugin . -x "node_modules/*" "*.DS_Store" ".git/*"
-```
+See [Setup → Step 2](#2-build-the-plugin-file) above.
