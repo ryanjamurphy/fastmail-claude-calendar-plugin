@@ -1,0 +1,17 @@
+{
+  "name": "fastmail-calendar",
+  "version": "1.0.0",
+  "description": "Read, create, update, and delete Fastmail calendar events via JMAP. Supports time-blocking workflows and season-based batch scheduling.",
+  "author": "Claude Cowork Plugin",
+  "env": {
+    "FASTMAIL_API_TOKEN": {
+      "description": "Fastmail API token (Settings → Privacy & Security → Manage API tokens). Needs calendar read/write scope.",
+      "required": true
+    },
+    "FASTMAIL_TIMEZONE": {
+      "description": "IANA timezone for interpreting relative dates (e.g., America/St_Johns, America/New_York).",
+      "required": false,
+      "default": "America/St_Johns"
+    }
+  }
+}
