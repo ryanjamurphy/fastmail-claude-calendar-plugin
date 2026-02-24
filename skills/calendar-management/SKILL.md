@@ -18,13 +18,13 @@ You have access to a Fastmail calendar integration via MCP tools. You can:
 1. **Read calendars and events** — List all calendars, view events for any date range
 2. **Create events** — Schedule new time blocks with title, description, time, timezone, and calendar
 3. **Update events** — Reschedule, rename, or modify existing events
-4. **Delete events** — Remove events by ID
+4. **Delete events** — Remove events by URL
 5. **Find free time** — Discover available slots across all calendars
 6. **Batch schedule** — Plan and create multiple time blocks for a season's worth of projects
 
 ## Available MCP Tools
 
-- `list_calendars` — List all Fastmail calendars (names, IDs, permissions)
+- `list_calendars` — List all Fastmail calendars (names, URLs)
 - `get_events` — Fetch events in a date range
 - `create_event` — Create a new event
 - `update_event` — Modify an existing event
@@ -109,7 +109,7 @@ This makes events identifiable at a glance in the calendar.
 - All times are handled in the configured `FASTMAIL_TIMEZONE` (default: `America/St_Johns`)
 - When interpreting user input like "tomorrow morning" or "Wednesday at 2pm," use the configured timezone
 - Always display times in the user's timezone for readability
-- Store events with the correct IANA timezone in the JMAP request
+- The MCP server stores events in UTC and handles timezone conversion
 
 ## Working with the Obsidian Vault
 

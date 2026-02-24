@@ -1,14 +1,20 @@
 # fastmail-calendar
 
-A Claude Cowork plugin that integrates with Fastmail's calendar via JMAP. Read, create, update, and delete calendar events. Supports time-blocking workflows and season-based batch scheduling.
+A Claude Cowork plugin that integrates with Fastmail's calendar via CalDAV. Read, create, update, and delete calendar events. Supports time-blocking workflows and season-based batch scheduling.
 
 ## Setup
 
-### 1. Get a Fastmail API Token
+### 1. Create a Fastmail App Password
 
-1. Go to **Fastmail Settings → Privacy & Security → Manage API tokens**
-2. Create a new token with **calendar read/write** scope
-3. Copy the token
+1. Go to **Fastmail Settings → Privacy & Security → Manage app passwords**
+2. Click **New app password**
+3. Give it a name (e.g. "Claude Calendar Plugin")
+4. Under access, select **Mail, Contacts & Calendars** (or a scope that includes CalDAV)
+5. Click **Generate password** and copy the generated password
+
+You'll also need your full Fastmail email address (e.g. `you@fastmail.com`).
+
+> **Note:** Fastmail does not currently support JMAP for calendars. This plugin uses CalDAV, which requires an app password — not an API token.
 
 ### 2. Build the Plugin File
 
@@ -29,10 +35,11 @@ This creates `/tmp/fastmail-calendar.plugin` — a zip archive containing the se
 4. Click the **+** in the upper-left of that tab
 5. Select **Upload plugin** and upload the `.plugin` file you built in step 2
 
-When prompted, set the required environment variable:
+When prompted, set the required environment variables:
 
 ```
-FASTMAIL_API_TOKEN=your-token-here
+FASTMAIL_USERNAME=you@fastmail.com
+FASTMAIL_APP_PASSWORD=your-app-password-here
 ```
 
 Optionally set your timezone (defaults to `America/St_Johns`):
@@ -67,9 +74,9 @@ The plugin exposes these tools for Claude to use:
 
 ## How It Works
 
-The plugin uses Fastmail's [JMAP API](https://www.fastmail.com/dev/) (JSON Meta Application Protocol) to interact with calendars. JMAP is a modern, efficient alternative to CalDAV that uses simple JSON-over-HTTP requests.
+The plugin uses Fastmail's [CalDAV](https://www.fastmail.help/hc/en-us/articles/360058752754-How-to-synchronize-a-calendar) endpoint (`caldav.fastmail.com`) to interact with calendars. Authentication uses a Fastmail app password with Basic auth.
 
-Events are stored in [JSCalendar format](https://datatracker.ietf.org/doc/rfc8984/) with timezone-aware local datetimes and ISO 8601 durations.
+Events are stored in [iCalendar format (ICS)](https://datatracker.ietf.org/doc/html/rfc5545) and converted to/from structured JSON by the MCP server. The [tsdav](https://github.com/natelindev/tsdav) library handles the CalDAV protocol.
 
 ## Season Scheduling Workflow
 
@@ -96,12 +103,12 @@ Calendar events can be created by **anyone who sends you an invite**. A maliciou
 **What you should do:**
 
 - **Never auto-approve write tools.** Always review the parameters when Claude Code asks to call `create_event`, `update_event`, or `delete_event`.
-- **Scope your API token.** In Fastmail's token settings, grant only the minimum permissions you need. If you don't need delete access, don't grant it.
+- **Scope your app password.** When creating the app password, only grant the access you need.
 - **Review batch operations carefully.** The `/schedule-season` command creates many events at once. Read the proposed schedule before confirming.
 
-### API token handling
+### Credential handling
 
-The `FASTMAIL_API_TOKEN` is passed as an environment variable to the MCP server process. Store it in `.claude/settings.local.json` (which is gitignored) or your shell profile — never commit it to version control.
+`FASTMAIL_USERNAME` and `FASTMAIL_APP_PASSWORD` are passed as environment variables to the MCP server process. Store them in `.claude/settings.local.json` (which is gitignored) or your shell profile — never commit them to version control.
 
 ## Building from Source
 

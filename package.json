@@ -1,13 +1,14 @@
 {
   "name": "fastmail-calendar",
   "version": "1.0.0",
-  "description": "Claude Cowork plugin for Fastmail calendar integration via JMAP",
+  "description": "Claude Cowork plugin for Fastmail calendar integration via CalDAV",
   "private": true,
   "type": "module",
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1"
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "tsdav": "^2.1.8"
   }
 }
