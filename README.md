@@ -9,7 +9,7 @@ A Claude Cowork plugin that integrates with Fastmail's calendar via CalDAV. Read
 1. Go to **Fastmail Settings → Privacy & Security → Manage app passwords**
 2. Click **New app password**
 3. Give it a name (e.g. "Claude Calendar Plugin")
-4. Under access, select **Mail, Contacts & Calendars** (or a scope that includes CalDAV)
+4. Under access, select **Calendars (CalDAV)** — this is the minimum scope needed
 5. Click **Generate password** and copy the generated password
 
 You'll also need your full Fastmail email address (e.g. `you@fastmail.com`).
