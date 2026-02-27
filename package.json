@@ -7,8 +7,15 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "scripts": {
+    "build": "esbuild servers/fastmail-calendar-server.js --bundle --platform=node --target=node18 --format=esm --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --outfile=servers/fastmail-calendar-server.bundle.mjs"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
-    "tsdav": "^2.1.8"
+    "tsdav": "^2.1.8",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.3"
   }
 }

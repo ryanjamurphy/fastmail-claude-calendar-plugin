@@ -2,11 +2,11 @@
   "mcpServers": {
     "fastmail-calendar": {
       "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/servers/fastmail-calendar-server.js"],
+      "args": ["${CLAUDE_PLUGIN_ROOT}/servers/fastmail-calendar-server.bundle.mjs"],
       "env": {
         "FASTMAIL_USERNAME": "${FASTMAIL_USERNAME}",
         "FASTMAIL_APP_PASSWORD": "${FASTMAIL_APP_PASSWORD}",
-        "FASTMAIL_TIMEZONE": "${FASTMAIL_TIMEZONE:-America/St_Johns}"
+        "FASTMAIL_TIMEZONE": "${FASTMAIL_TIMEZONE}"
       }
     }
   }

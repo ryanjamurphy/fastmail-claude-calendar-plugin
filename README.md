@@ -18,14 +18,15 @@ You'll also need your full Fastmail email address (e.g. `you@fastmail.com`).
 
 ### 2. Build the Plugin File
 
-From the root of this repository, install dependencies and package the plugin:
+From the root of this repository, install dependencies, bundle the MCP server, and package the plugin:
 
 ```bash
 npm install
+npm run build
 zip -r /tmp/fastmail-calendar.plugin . -x "node_modules/*" "*.DS_Store" ".git/*"
 ```
 
-This creates `/tmp/fastmail-calendar.plugin` — a zip archive containing the server, skills, and plugin manifest.
+`npm run build` bundles the MCP server and all its dependencies into a single file (`servers/fastmail-calendar-server.bundle.mjs`). This means the `.plugin` zip doesn't need `node_modules/` — everything is self-contained.
 
 ### 3. Install in Claude Cowork
 
@@ -112,4 +113,9 @@ Calendar events can be created by **anyone who sends you an invite**. A maliciou
 
 ## Building from Source
 
-See [Setup → Step 2](#2-build-the-plugin-file) above.
+```bash
+npm install        # install dependencies (including esbuild)
+npm run build      # bundle MCP server → servers/fastmail-calendar-server.bundle.mjs
+```
+
+Then zip as described in [Setup → Step 2](#2-build-the-plugin-file).
