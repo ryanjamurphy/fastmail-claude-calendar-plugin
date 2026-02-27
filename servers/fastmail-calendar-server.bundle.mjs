@@ -38120,14 +38120,43 @@ var FASTMAIL_USERNAME = process.env.FASTMAIL_USERNAME;
 var FASTMAIL_APP_PASSWORD = process.env.FASTMAIL_APP_PASSWORD;
 var TIMEZONE = process.env.FASTMAIL_TIMEZONE || "America/St_Johns";
 var CALDAV_SERVER = "https://caldav.fastmail.com/";
-if (!FASTMAIL_USERNAME || !FASTMAIL_APP_PASSWORD) {
-  console.error(
-    "FASTMAIL_USERNAME and FASTMAIL_APP_PASSWORD are required.\nCreate an app password at Fastmail Settings \u2192 Privacy & Security \u2192 Manage app passwords."
-  );
-  process.exit(1);
+var CREDENTIALS_CONFIGURED = FASTMAIL_USERNAME && FASTMAIL_APP_PASSWORD && !FASTMAIL_USERNAME.startsWith("${") && !FASTMAIL_APP_PASSWORD.startsWith("${");
+var SETUP_MESSAGE = `Fastmail Calendar plugin is not configured yet.
+
+To set up your credentials, add these environment variables to your Claude Code settings:
+
+1. Open Claude Code settings (run \`claude config set env.FASTMAIL_USERNAME you@fastmail.com\` and \`claude config set env.FASTMAIL_APP_PASSWORD your-app-password\`)
+
+   Or add to ~/.claude/settings.json:
+   {
+     "env": {
+       "FASTMAIL_USERNAME": "you@fastmail.com",
+       "FASTMAIL_APP_PASSWORD": "your-app-password-here",
+       "FASTMAIL_TIMEZONE": "America/St_Johns"
+     }
+   }
+
+2. Create a Fastmail app password:
+   - Go to Fastmail Settings \u2192 Privacy & Security \u2192 Manage app passwords
+   - Click "New app password"
+   - Name it (e.g. "Claude Calendar Plugin")
+   - Under access, select "Calendars (CalDAV)"
+   - Copy the generated password
+
+3. Your username is your full Fastmail email address (the one you signed up with, not an alias)
+
+After setting credentials, restart the Cowork session for changes to take effect.`;
+function setupRequired() {
+  return {
+    content: [{ type: "text", text: SETUP_MESSAGE }],
+    isError: true
+  };
 }
 var davClient = null;
 async function getClient() {
+  if (!CREDENTIALS_CONFIGURED) {
+    throw new Error(SETUP_MESSAGE);
+  }
   if (davClient) return davClient;
   davClient = new import_tsdav.DAVClient({
     serverUrl: CALDAV_SERVER,
@@ -38583,8 +38612,43 @@ async function findFreeSlots({ after, before, minDuration, calendarUrl }) {
 }
 var server = new McpServer({
   name: "fastmail-calendar",
-  version: "2.0.0"
+  version: "2.1.0"
 });
+server.tool(
+  "setup_credentials",
+  "Check Fastmail Calendar plugin configuration status and get setup instructions if credentials are missing.",
+  {},
+  async () => {
+    if (CREDENTIALS_CONFIGURED) {
+      try {
+        await getClient();
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Fastmail Calendar plugin is configured and connected.
+Username: ${FASTMAIL_USERNAME}
+Timezone: ${TIMEZONE}`
+            }
+          ]
+        };
+      } catch (err) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Credentials are set but connection failed: ${err.message}
+
+Please verify your app password is correct and has CalDAV access.`
+            }
+          ],
+          isError: true
+        };
+      }
+    }
+    return setupRequired();
+  }
+);
 server.tool(
   "list_calendars",
   "List all calendars in the Fastmail account. Returns calendar URLs and names.",

@@ -22,8 +22,20 @@ You have access to a Fastmail calendar integration via MCP tools. You can:
 5. **Find free time** — Discover available slots across all calendars
 6. **Batch schedule** — Plan and create multiple time blocks for a season's worth of projects
 
+## Setup
+
+Before using calendar tools, credentials must be configured. If the MCP tools return a setup message, guide the user through configuration:
+
+1. The user needs a **Fastmail app password** scoped to "Calendars (CalDAV)" — created at Fastmail Settings → Privacy & Security → Manage app passwords
+2. Credentials are set as environment variables: `FASTMAIL_USERNAME` (full Fastmail email) and `FASTMAIL_APP_PASSWORD`
+3. In Claude Code CLI: `claude config set env.FASTMAIL_USERNAME you@fastmail.com` and `claude config set env.FASTMAIL_APP_PASSWORD the-app-password`
+4. After setting credentials, the session must be restarted
+
+Call the `setup_credentials` tool to check if the plugin is configured.
+
 ## Available MCP Tools
 
+- `setup_credentials` — Check plugin configuration status and get setup instructions
 - `list_calendars` — List all Fastmail calendars (names, URLs)
 - `get_events` — Fetch events in a date range
 - `create_event` — Create a new event

@@ -1,21 +1,9 @@
 {
   "name": "fastmail-calendar",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Read, create, update, and delete Fastmail calendar events via CalDAV. Supports time-blocking workflows and season-based batch scheduling.",
-  "author": "Claude Cowork Plugin",
-  "env": {
-    "FASTMAIL_USERNAME": {
-      "description": "Your full Fastmail email address (e.g., you@fastmail.com).",
-      "required": true
-    },
-    "FASTMAIL_APP_PASSWORD": {
-      "description": "Fastmail app password (Settings → Privacy & Security → Manage app passwords). Must include calendar access.",
-      "required": true
-    },
-    "FASTMAIL_TIMEZONE": {
-      "description": "IANA timezone for interpreting relative dates (e.g., America/St_Johns, America/New_York).",
-      "required": false,
-      "default": "America/St_Johns"
-    }
-  }
+  "author": {
+    "name": "Claude Cowork Plugin"
+  },
+  "keywords": ["calendar", "fastmail", "caldav", "scheduling", "time-blocking"]
 }
