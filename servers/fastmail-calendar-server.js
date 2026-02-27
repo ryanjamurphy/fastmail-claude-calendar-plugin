@@ -74,7 +74,7 @@ async function getClient() {
   }
   if (davClient) return davClient;
 
-  davClient = new DAVClient({
+  const client = new DAVClient({
     serverUrl: CALDAV_SERVER,
     credentials: {
       username: FASTMAIL_USERNAME,
@@ -84,7 +84,8 @@ async function getClient() {
     defaultAccountType: "caldav",
   });
 
-  await davClient.login();
+  await client.login();
+  davClient = client; // Only cache after successful login
   return davClient;
 }
 
@@ -726,30 +727,62 @@ server.tool(
   "Check Fastmail Calendar plugin configuration status and get setup instructions if credentials are missing.",
   {},
   async () => {
-    if (CREDENTIALS_CONFIGURED) {
-      try {
-        await getClient();
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Fastmail Calendar plugin is configured and connected.\nUsername: ${FASTMAIL_USERNAME}\nTimezone: ${TIMEZONE}`,
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Credentials are set but connection failed: ${err.message}\n\nPlease verify your app password is correct and has CalDAV access.`,
-            },
-          ],
-          isError: true,
-        };
-      }
+    if (!CREDENTIALS_CONFIGURED) {
+      return setupRequired();
     }
-    return setupRequired();
+
+    const diagnostics = [`Username: ${FASTMAIL_USERNAME}`, `Timezone: ${TIMEZONE}`];
+
+    // Test 1: Can we resolve DNS and reach the server at all?
+    try {
+      const res = await fetch(CALDAV_SERVER, { method: "OPTIONS" });
+      diagnostics.push(`Network: OK (HTTP ${res.status})`);
+    } catch (netErr) {
+      diagnostics.push(`Network: FAILED — ${netErr.message}`);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Fastmail Calendar plugin credentials are set but cannot reach ${CALDAV_SERVER}.\n\n` +
+              diagnostics.join("\n") +
+              "\n\nThis likely means outbound HTTPS connections to caldav.fastmail.com are blocked in this environment. " +
+              "The CalDAV MCP server needs to make outbound HTTPS requests to Fastmail's servers. " +
+              "If you're running this in a sandboxed environment (like Cowork), outbound network access to third-party services may be restricted.",
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    // Test 2: Can we authenticate and discover calendars?
+    try {
+      davClient = null; // Force fresh login for the test
+      await getClient();
+      const calendars = await getCalendars();
+      diagnostics.push(`CalDAV login: OK`);
+      diagnostics.push(`Calendars found: ${calendars.length}`);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Fastmail Calendar plugin is configured and connected.\n\n` + diagnostics.join("\n"),
+          },
+        ],
+      };
+    } catch (err) {
+      diagnostics.push(`CalDAV login: FAILED — ${err.message}`);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Credentials are set but CalDAV connection failed.\n\n` +
+              diagnostics.join("\n") +
+              "\n\nPlease verify your app password is correct and has CalDAV access.",
+          },
+        ],
+        isError: true,
+      };
+    }
   }
 );
 
